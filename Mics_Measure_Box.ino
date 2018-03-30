@@ -25,6 +25,7 @@
 #define FALSE 0
 #define TRUE 1
 
+#define BUTTON_PIN 7
 #define DHT11_PIN 8
 #define ONE_WIRE_BUS 9
 #define TEMPERATURE_PRECISION 9
@@ -160,10 +161,14 @@ void setup()
   LCD.createChar(6, smiley_cross);
   ds18b20.begin();
   //ds18b20.setResolution(tempDeviceAddress, TEMPERATURE_PRECISION);
+
+  pinMode(BUTTON_PIN, INPUT);
 }
 
 void loop()
 {
+  checkButtonState();
+
   if ( TRUE == sayHiGuard ) { sayHiGuard = sayHi();  }
 
   ds18b20.requestTemperatures(); // Send the command to get temperature readings
@@ -180,7 +185,7 @@ void loop()
       DS18B20_temp = ds18b20.getTempCByIndex(0);
 
       LCD.setCursor(0,0);
-      LCD.print("Tem  Humid Liqui");
+      LCD.print("Temp Humid Liqui");
       LCD.setCursor(0,1);
       LCD.print (eineNachkommaStelle(DHT11_temp, DHT11_SENSOR));
       LCD.print(" ");
@@ -430,4 +435,20 @@ int dhtAvailable (float temp, float humid)
   { return  DHT_PARTIALLY_AVAILABLE;  }
   else
   { return DHT_FULLY_AVAILABLE; }
+}
+
+void checkButtonState ()
+{
+  // read the state of the pushbutton value:
+  int buttonState = digitalRead(BUTTON_PIN);
+
+  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  if (buttonState == HIGH)
+  {
+    Serial.println("Button_psuhed");
+    LCD.clear();
+    LCD.setCursor(0,0);
+    LCD.write(byte(BIG_SMILEY));
+    delay(500);
+  }
 }
